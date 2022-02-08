@@ -1,6 +1,18 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :correct_user, only: [:edit, :update]
+  
+  
+  def search
+    @user = User.find(params[:user_id])
+    @books = @user.books 
+    if params[:created_at] == ""
+      @search_book = "日付を選択してください"
+    else
+      create_at = params[:created_at]
+      @search_book = @books.where(['created_at LIKE ? ', "#{create_at}%"]).count
+    end
+  end
 
   def index
     @new_book = Book.new
@@ -14,18 +26,17 @@ class UsersController < ApplicationController
     @books = @user.books
     @new_book = Book.new
     # @books = Book.where(user_id: @user.id)
-
     @today_book =  @books.created_today
     @yesterday_book = @books.created_yesterday
     @this_week_book = @books.created_this_week
     @last_week_book = @books.created_last_week
-    
 
   end
 
   def edit
     @user = User.find(params[:id])
   end
+
 
   def update
     @user = User.find(params[:id])
